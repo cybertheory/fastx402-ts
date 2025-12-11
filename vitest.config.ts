@@ -6,6 +6,10 @@ export default defineConfig({
     environment: "node",
   },
   // Ignore PostCSS config issues
-  css: false,
+  css: {
+    postcss: false,
+  },
+  // Don't search for config files in parent directories
+  root: process.cwd(),
 });
 

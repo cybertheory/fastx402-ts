@@ -1,0 +1,45 @@
+{
+  "name": "fastx402",
+  "version": "0.1.0",
+  "description": "TypeScript/Express integration for x402 HTTP-native payments",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts src/server/index.ts src/client/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts src/server/index.ts src/client/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "x402",
+    "payments",
+    "express",
+    "middleware",
+    "ethereum",
+    "web3",
+    "eip-712"
+  ],
+  "author": "fastx402 contributors",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "express": "^4.18.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "nock": "^13.4.0"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  }
+}
+

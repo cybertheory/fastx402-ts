@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fastx402 Example Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #667eea;
+            color: white;
+        }
+
+        button:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #6c757d;
+        }
+
+        button.secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
+
+        button.danger {
+            background: #dc3545;
+        }
+
+        button.danger:hover:not(:disabled) {
+            background: #c82333;
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .challenge-display {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .challenge-display h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .challenge-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .challenge-item:last-child {
+            border-bottom: none;
+        }
+
+        .challenge-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .challenge-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .response-display {
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-display h3 {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .wallet-info {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .wallet-info strong {
+            color: #1976D2;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 fastx402 Example Client</h1>
+        <p class="subtitle">Test x402 payment-protected endpoints with wallet signing</p>
+
+        <!-- Server Configuration -->
+        <div class="section">
+            <h2>Server Configuration</h2>
+            <label for="serverUrl">Server URL:</label>
+            <input type="text" id="serverUrl" value="http://localhost:3000" placeholder="http://localhost:3000">
+        </div>
+
+        <!-- Wallet Status -->
+        <div class="section">
+            <h2>Wallet Status</h2>
+            <div id="walletStatus" class="wallet-info">
+                <strong>Status:</strong> <span id="walletAddress">Not connected</span>
+            </div>
+            <button id="connectWallet" class="secondary">Connect Wallet</button>
+        </div>
+
+        <!-- Free Endpoint -->
+        <div class="section">
+            <h2>Free Endpoint</h2>
+            <p style="color: #666; margin-bottom: 15px;">Test a free endpoint (no payment required)</p>
+            <button id="freeRequest">GET /free</button>
+        </div>
+
+        <!-- Paid Endpoints -->
+        <div class="section">
+            <h2>Paid Endpoints</h2>
+            <p style="color: #666; margin-bottom: 15px;">These endpoints require payment signatures</p>
+            <div class="button-group">
+                <button id="paidRequest">GET /paid (0.01 USDC)</button>
+                <button id="premiumRequest">GET /premium (0.05 USDC)</button>
+                <button id="apiDataRequest">GET /api/data (0.02 USDC)</button>
+            </div>
+        </div>
+
+        <!-- Challenge Display -->
+        <div id="challengeSection" style="display: none;">
+            <div class="section">
+                <h2>💰 Payment Challenge</h2>
+                <div id="challengeDisplay" class="challenge-display"></div>
+                <button id="signChallenge" class="secondary">Sign Challenge</button>
+                <button id="cancelChallenge" class="danger">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessages"></div>
+
+        <!-- Response Display -->
+        <div id="responseSection" style="display: none;">
+            <div class="section">
+                <h2>Response</h2>
+                <div id="responseDisplay" class="response-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import x402instant
+        import { initX402, x402Fetch, detectWallets, signPaymentChallenge } from '../x402instant/src/index.js';
+        import type { PaymentChallenge } from '../x402instant/src/types.js';
+
+        // State
+        let currentChallenge = null;
+        let walletConnected = false;
+        let serverUrl = 'http://localhost:3000';
+
+        // DOM Elements
+        const serverUrlInput = document.getElementById('serverUrl');
+        const walletStatus = document.getElementById('walletStatus');
+        const walletAddress = document.getElementById('walletAddress');
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const freeRequestBtn = document.getElementById('freeRequest');
+        const paidRequestBtn = document.getElementById('paidRequest');
+        const premiumRequestBtn = document.getElementById('premiumRequest');
+        const apiDataRequestBtn = document.getElementById('apiDataRequest');
+        const challengeSection = document.getElementById('challengeSection');
+        const challengeDisplay = document.getElementById('challengeDisplay');
+        const signChallengeBtn = document.getElementById('signChallenge');
+        const cancelChallengeBtn = document.getElementById('cancelChallenge');
+        const statusMessages = document.getElementById('statusMessages');
+        const responseSection = document.getElementById('responseSection');
+        const responseDisplay = document.getElementById('responseDisplay');
+
+        // Initialize x402
+        async function init() {
+            try {
+                await initX402({
+                    autoConnect: false,
+                    defaultChain: 8453,
+                    preferredToken: "USDC",
+                    onWalletConnected: (addr) => {
+                        walletConnected = true;
+                        walletAddress.textContent = addr;
+                        walletStatus.innerHTML = `<strong>Status:</strong> Connected (${addr.substring(0, 6)}...${addr.substring(addr.length - 4)})`;
+                        addStatus('Wallet connected successfully', 'success');
+                    },
+                    onError: (error) => {
+                        addStatus(`Error: ${error.message}`, 'error');
+                    }
+                });
+                addStatus('x402 initialized', 'info');
+            } catch (error) {
+                addStatus(`Failed to initialize: ${error.message}`, 'error');
+            }
+        }
+
+        // Connect wallet
+        connectWalletBtn.addEventListener('click', async () => {
+            try {
+                const wallets = await detectWallets();
+                if (wallets.length === 0) {
+                    addStatus('No wallets detected. Please install MetaMask or another wallet.', 'warning');
+                    return;
+                }
+
+                // Use first available wallet
+                const wallet = wallets[0];
+                const address = await wallet.provider.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (address && address[0]) {
+                    walletConnected = true;
+                    walletAddress.textContent = address[0];
+                    walletStatus.innerHTML = `<strong>Status:</strong> Connected (${address[0].substring(0, 6)}...${address[0].substring(address[0].length - 4)})`;
+                    addStatus('Wallet connected successfully', 'success');
+                }
+            } catch (error) {
+                addStatus(`Failed to connect wallet: ${error.message}`, 'error');
+            }
+        });
+
+        // Update server URL
+        serverUrlInput.addEventListener('change', (e) => {
+            serverUrl = e.target.value;
+        });
+
+        // Add status message
+        function addStatus(message, type = 'info') {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusMessages.insertBefore(statusDiv, statusMessages.firstChild);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 5000);
+        }
+
+        // Display challenge
+        function displayChallenge(challenge) {
+            currentChallenge = challenge;
+            challengeDisplay.innerHTML = `
+                <h3>Payment Details</h3>
+                <div class="challenge-item">
+                    <span class="challenge-label">Price:</span>
+                    <span class="challenge-value">${challenge.price} ${challenge.currency}</span>
+                </div>
+                <div class="challenge-item">
+                    <span class="challenge-label">Chain ID:</span>
+                    <span class="challenge-value">${challenge.chain_id}</span>
+                </div>
+                <div class="challenge-item">
+                    <span class="challenge-label">Merchant:</span>
+                    <span class="challenge-value">${challenge.merchant}</span>
+                </div>
+                ${challenge.description ? `
+                <div class="challenge-item">
+                    <span class="challenge-label">Description:</span>
+                    <span class="challenge-value">${challenge.description}</span>
+                </div>
+                ` : ''}
+            `;
+            challengeSection.style.display = 'block';
+        }
+
+        // Hide challenge
+        function hideChallenge() {
+            challengeSection.style.display = 'none';
+            currentChallenge = null;
+        }
+
+        // Display response
+        function displayResponse(data) {
+            responseDisplay.innerHTML = `
+                <h3>Response Data</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            responseSection.style.display = 'block';
+        }
+
+        // Make request with x402 handling
+        async function makeRequest(endpoint) {
+            if (!walletConnected) {
+                addStatus('Please connect wallet first', 'warning');
+                return;
+            }
+
+            try {
+                addStatus(`Making request to ${endpoint}...`, 'info');
+                const response = await x402Fetch(`${serverUrl}${endpoint}`);
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    addStatus('Request successful!', 'success');
+                    displayResponse(data);
+                } else {
+                    addStatus(`Request failed: ${response.status}`, 'error');
+                    displayResponse(data);
+                }
+            } catch (error) {
+                addStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Make request and handle 402 manually
+        async function makeRequestWithChallenge(endpoint) {
+            if (!walletConnected) {
+                addStatus('Please connect wallet first', 'warning');
+                return;
+            }
+
+            try {
+                addStatus(`Making request to ${endpoint}...`, 'info');
+                
+                // Make initial request
+                const response = await fetch(`${serverUrl}${endpoint}`);
+                const data = await response.json();
+                
+                if (response.status === 402) {
+                    // Display challenge
+                    if (data.challenge) {
+                        displayChallenge(data.challenge);
+                        addStatus('Payment required. Please sign the challenge.', 'warning');
+                    } else {
+                        addStatus('Received 402 but no challenge data', 'error');
+                    }
+                } else if (response.status === 200) {
+                    addStatus('Request successful!', 'success');
+                    displayResponse(data);
+                } else {
+                    addStatus(`Request failed: ${response.status}`, 'error');
+                    displayResponse(data);
+                }
+            } catch (error) {
+                addStatus(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Sign challenge and retry
+        signChallengeBtn.addEventListener('click', async () => {
+            if (!currentChallenge) {
+                addStatus('No challenge to sign', 'error');
+                return;
+            }
+
+            try {
+                addStatus('Signing challenge...', 'info');
+                const signature = await signPaymentChallenge(currentChallenge);
+                
+                if (!signature) {
+                    addStatus('Failed to sign challenge', 'error');
+                    return;
+                }
+
+                addStatus('Challenge signed! Retrying request...', 'success');
+                
+                // Create payment header
+                const paymentHeader = JSON.stringify({
+                    signature: signature.signature,
+                    signer: signature.signer,
+                    challenge: signature.challenge
+                });
+
+                // Get the endpoint from the last request (simplified - in real app, store this)
+                const endpoint = window.lastRequestEndpoint || '/paid';
+                
+                // Retry request with payment header
+                const response = await fetch(`${serverUrl}${endpoint}`, {
+                    headers: {
+                        'X-PAYMENT': paymentHeader
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.status === 200) {
+                    addStatus('Payment verified! Request successful!', 'success');
+                    displayResponse(data);
+                    hideChallenge();
+                } else {
+                    addStatus(`Payment verification failed: ${response.status}`, 'error');
+                    displayResponse(data);
+                }
+            } catch (error) {
+                addStatus(`Error signing challenge: ${error.message}`, 'error');
+            }
+        });
+
+        // Cancel challenge
+        cancelChallengeBtn.addEventListener('click', () => {
+            hideChallenge();
+            addStatus('Challenge cancelled', 'info');
+        });
+
+        // Button handlers
+        freeRequestBtn.addEventListener('click', () => {
+            window.lastRequestEndpoint = '/free';
+            makeRequest('/free');
+        });
+
+        paidRequestBtn.addEventListener('click', () => {
+            window.lastRequestEndpoint = '/paid';
+            makeRequestWithChallenge('/paid');
+        });
+
+        premiumRequestBtn.addEventListener('click', () => {
+            window.lastRequestEndpoint = '/premium';
+            makeRequestWithChallenge('/premium');
+        });
+
+        apiDataRequestBtn.addEventListener('click', () => {
+            window.lastRequestEndpoint = '/api/data';
+            makeRequestWithChallenge('/api/data');
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
+
